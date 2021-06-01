@@ -46,17 +46,19 @@ def process_params(options, param_path=None):
     params['all_bc'] = options.all_bc
     params['eval_model'] = options.eval_model
     params['exp_dir'] = None
+    params['data_file'] = options.data_file
 
     assert params['env_name'] == options.env
     assert params['noise'] in ['pure', 'eps1', 'eps3', 'gaussian1', 'gaussian3', 'random']
-    # data_file
-    if params['env_name'] == 'ant':
-        params['data_file'] = "./data/Ant/{}/data".format(params['noise'])
-    elif params['env_name'] == 'half_cheetah':
-        params['data_file'] = "./data/HalfCheetah/{}/data".format(params['noise'])
-    elif params['env_name'] == 'hopper':
-        params['data_file'] = "./data/Hopper/{}/data".format(params['noise'])
-    elif params['env_name'] == 'walker2d':
-        params['data_file'] = "./data/Walker2d/{}/data".format(params['noise'])
+
+    # # data_file
+    # if params['env_name'] == 'ant':
+    #     params['data_file'] = "./data/Ant/{}/data".format(params['noise'])
+    # elif params['env_name'] == 'half_cheetah':
+    #     params['data_file'] = "./data/HalfCheetah/{}/data".format(params['noise'])
+    # elif params['env_name'] == 'hopper':
+    #     params['data_file'] = "./data/Hopper/{}/data".format(params['noise'])
+    # elif params['env_name'] == 'walker2d':
+    #     params['data_file'] = "./data/Walker2d/{}/data".format(params['noise'])
 
     return params

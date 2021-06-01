@@ -33,7 +33,7 @@ def log_tabular_results(returns, itr, train_collection):
     logger.dump_tabular()
 
 
-def get_data_from_offline_batch(params, env, normalization_scope=None, model='dynamics', split_ratio=0.666667):
+def get_data_from_offline_batch(params, env, normalization_scope=None, model='dynamics', split_ratio=0.9):
     train_collection = DataCollection(
         batch_size=params[model]['batch_size'],
         max_size=params['max_train_data'], shuffle=True)
@@ -41,8 +41,13 @@ def get_data_from_offline_batch(params, env, normalization_scope=None, model='dy
                                     max_size=params['max_val_data'],
                                     shuffle=False)
     rollout_sampler = RolloutSampler(env)
-    rl_paths = rollout_sampler.generate_offline_data(
-            data_file=params['data_file'],
+    # rl_paths = rollout_sampler.generate_offline_data(
+    #        data_file=params['data_file'],
+    #        n_train=params["n_train"]
+    #    )
+    print(params)
+    rl_paths = rollout_sampler.generate_d4rl_data(
+            dataset_name=params['data_file'],
             n_train=params["n_train"]
         )
     path_collection = PathCollection()
@@ -302,6 +307,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='run experiment options')
     parser.add_argument('--env')
     parser.add_argument('--exp_name')
+    parser.add_argument('--data_file', type=str)
     parser.add_argument('--sub_exp_name', default="")
     parser.add_argument('--noise', default='pure')
     parser.add_argument('--algo', default='trpo')

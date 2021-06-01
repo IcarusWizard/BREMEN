@@ -6,6 +6,8 @@ import logger
 import tensorflow as tf
 import numpy as np
 
+import d4rl 
+import gym
 
 class RolloutSampler:
     def __init__(self, env, dynamics=None, controller=None):
@@ -37,6 +39,30 @@ class RolloutSampler:
         s2 = tf.train.load_variable(data_file, 'data/_s2/.ATTRIBUTES/VARIABLE_VALUE')
         a1 = tf.train.load_variable(data_file, 'data/_a1/.ATTRIBUTES/VARIABLE_VALUE')
         r = tf.train.load_variable(data_file, 'data/_reward/.ATTRIBUTES/VARIABLE_VALUE')
+        data_size = max(s1.shape[0], s2.shape[0], a1.shape[0], r.shape[0])
+        n_train = min(n_train, data_size)
+        paths = []
+        for i in range(int(n_train/horizon)):
+            path = Path()
+            if i*horizon % 10000 == 0:
+                print(i*horizon)
+            for j in range(i*horizon, (i+1)*horizon, 1):
+                obs = s1[j].tolist()
+                action = a1[j].tolist()
+                next_obs = s2[j].tolist()
+                reward = r[j].tolist()
+                path.add_timestep(obs, action, next_obs, reward)
+            paths.append(path)
+
+        return paths
+
+    def generate_d4rl_data(self, dataset_name='hopper-medium-v0', n_train=int(1e6), horizon=1000):
+        dataset = d4rl.qlearning_dataset(gym.make(dataset_name).env)
+        # datafile: str
+        s1 = dataset['observations']
+        s2 = dataset['next_observations']
+        a1 = dataset['actions']
+        r = dataset['rewards']
         data_size = max(s1.shape[0], s2.shape[0], a1.shape[0], r.shape[0])
         n_train = min(n_train, data_size)
         paths = []

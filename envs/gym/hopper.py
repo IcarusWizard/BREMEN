@@ -19,7 +19,7 @@ class HopperEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         )
         utils.EzPickle.__init__(self)
 
-    def _step(self, action):
+    def step(self, action):
         old_ob = self._get_obs()
         self.do_simulation(action, self.frame_skip)
         ob = self._get_obs()
@@ -41,21 +41,21 @@ class HopperEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def _get_obs(self):
         return np.concatenate([
-            self.model.data.qpos.flat[1:],
-            self.model.data.qvel.flat,
+            self.sim.data.qpos.flat[1:],
+            self.sim.data.qvel.flat,
         ])
 
     def reset_model(self):
         self.set_state(
-            self.init_qpos + self.np_random.uniform(low=-.005, high=.005, size=self.model.nq),
-            self.init_qvel + self.np_random.uniform(low=-.005, high=.005, size=self.model.nv)
+            self.init_qpos + self.np_random.uniform(low=-.005, high=.005, size=self.sim.nq),
+            self.init_qvel + self.np_random.uniform(low=-.005, high=.005, size=self.sim.nv)
         )
-        self.prev_qpos = np.copy(self.model.data.qpos.flat)
+        self.prev_qpos = np.copy(self.sim.data.qpos.flat)
         return self._get_obs()
 
     def viewer_setup(self):
         self.viewer.cam.trackbodyid = 2
-        self.viewer.cam.distance = self.model.stat.extent * 0.75
+        self.viewer.cam.distance = self.sim.stat.extent * 0.75
         self.viewer.cam.lookat[2] += .8
         self.viewer.cam.elevation = -20
 

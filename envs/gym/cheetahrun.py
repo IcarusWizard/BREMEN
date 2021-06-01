@@ -21,7 +21,7 @@ class CheetahRunEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         )
         utils.EzPickle.__init__(self)
 
-    def _step(self, action):
+    def step(self, action):
         start_ob = self._get_obs()
         x = start_ob[8]
         lower = _RUN_SPEED
@@ -44,19 +44,19 @@ class CheetahRunEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def _get_obs(self):
         return np.concatenate([
-            self.model.data.qpos.flat[1:],
-            self.model.data.qvel.flat,
+            self.sim.data.qpos.flat[1:],
+            self.sim.data.qvel.flat,
         ])
 
     def reset_model(self):
         qpos = self.init_qpos + \
-            self.np_random.uniform(low=-.1, high=.1, size=self.model.nq)
-        qvel = self.init_qvel + self.np_random.randn(self.model.nv) * .1
+            self.np_random.uniform(low=-.1, high=.1, size=self.sim.nq)
+        qvel = self.init_qvel + self.np_random.randn(self.sim.nv) * .1
         self.set_state(qpos, qvel)
         return self._get_obs()
 
     def viewer_setup(self):
-        self.viewer.cam.distance = self.model.stat.extent * 0.5
+        self.viewer.cam.distance = self.sim.stat.extent * 0.5
 
     def cost_np_vec(self, obs, acts, next_obs):
         x = obs[:, 8]
